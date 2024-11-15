@@ -13,7 +13,7 @@ Describe your environment settings, structure of your code, and usage instructio
 
 4. Approach
 
-중요하게 생각하는 ** Points **  
+중요하게 생각하는 **Points** 
 - train_data Quality
 - parameters
 
