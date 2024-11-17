@@ -5,6 +5,8 @@ SROIE 데이터셋을 활용한 문서 정보 추출 태스크 구현
 ## 1. Summary
 본 프로젝트는 영수증 이미지에서 주요 정보(회사명, 날짜, 주소, 총액)를 추출하는 과제를 수행했습니다. [**LayoutLMv3 모델**](https://huggingface.co/microsoft/layoutlmv3-base) Fine-tuning을 진행하여 구현하였으며, 데이터 처리 방식의 개선과 Sliding Window 기법 도입을 통해 성능을 점진적으로 향상시켰습니다. 또한 데이터 라벨 수정 작업을 통해 데이터 품질을 개선하였으며, 최종적으로 F1 점수 84.965, 정확도 50.4323을 달성했습니다.
 
+[Dongwooks HF-repo](https://huggingface.co/Dongwookss)
+
 ## 2. Experimental Results
 
 ### 성능 평가 결과
