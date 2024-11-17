@@ -1,11 +1,9 @@
-# Visual_information_extraction
-
 # Visual Information Extraction Task
 
-[SROIE](https://paperswithcode.com/dataset/sroie) 데이터셋을 활용한 문서 정보 추출 태스크 구현
+SROIE 데이터셋을 활용한 문서 정보 추출 태스크 구현
 
 ## 1. Summary
-본 프로젝트는 영수증 이미지에서 주요 정보(회사명, 날짜, 주소, 총액)를 추출하는 과제를 수행했습니다. LayoutLMv3 모델을 기반으로 구현하였으며, 데이터 처리 방식의 개선과 Sliding Window 기법 도입을 통해 성능을 점진적으로 향상시켰습니다. 또한 데이터 라벨 수정 작업을 통해 데이터 품질을 개선하였으며, 최종적으로 F1 점수 84.965, 정확도 50.4323을 달성했습니다.
+본 프로젝트는 영수증 이미지에서 주요 정보(회사명, 날짜, 주소, 총액)를 추출하는 과제를 수행했습니다. [**LayoutLMv3 모델**](https://huggingface.co/microsoft/layoutlmv3-base) Fine-tuning을 진행하여 구현하였으며, 데이터 처리 방식의 개선과 Sliding Window 기법 도입을 통해 성능을 점진적으로 향상시켰습니다. 또한 데이터 라벨 수정 작업을 통해 데이터 품질을 개선하였으며, 최종적으로 F1 점수 84.965, 정확도 50.4323을 달성했습니다.
 
 ## 2. Experimental Results
 
@@ -49,22 +47,16 @@ project/
 1. 데이터 전처리
    ```python
    # SROIE 데이터셋 로드 및 처리
-   python preprocessing/data_loader.py
-   python preprocessing/text_processor.py
    ```
 
 2. 모델 학습
    ```python
-   python model/train.py \
-       --output_dir="test" \
-       --max_steps=1500 \
-       --learning_rate=2e-5 \
-       --per_device_train_batch_size=2
+   python modeltrain.ipynb
    ```
 
 3. 평가 및 추론
    ```python
-   python model/inference.py
+   python modeltrain.ipynb
    ```
 
 ## 4. Approach
