@@ -2,6 +2,8 @@
 
 ## 작성자: 강동욱
 
+[🤗 Dongwooks HF-repo](https://huggingface.co/Dongwookss)
+
 ![HuggingFace](https://img.shields.io/badge/huggingface-yellow?style=for-the-badge&logo=HuggingFace)
 ![Colab](https://img.shields.io/badge/Colab-black?style=for-the-badge&logo=GoogleColab)
 
@@ -16,7 +18,12 @@
 ## 1. 프로젝트 개요
 
 ### 1.1 과제 목표
-본 프로젝트는 SROIE 데이터셋을 활용하여 영수증 문서에서 주요 정보(company, date, address, total)를 자동으로 추출하는 모델을 개발하는 것을 목표로 합니다. 이는 문서 처리 자동화의 핵심 과제로, 정확하고 효율적인 정보 추출이 요구됩니다.
+
+본 프로젝트는 문서 이해 분야의 핵심 과제인 정보 추출(Information Extraction) 태스크를 다룹니다. 구체적으로는 영수증 문서에서 회사명, 날짜, 주소, 총액과 같은 핵심 정보를 자동으로 추출하는 딥러닝 모델을 개발하여, 문서 처리 자동화의 정확성과 효율성을 갖춘 모델을 목표로 합니다.
+
+이를 위해 최신 문서 이해 모델인 LayoutLMv3를 기반으로 하여, 텍스트 정보와 공간 정보를 효과적으로 활용하는 방법을 연구했습니다. 특히 긴 문서 처리를 위한 Sliding Window 기법의 도입과 데이터 품질 개선을 통해, 실제 업무 환경에서 활용 가능한 수준의 성능을 달성하는 것을 목표로 진행하였습니다.
+
+[Dongwooks HF-repo](https://huggingface.co/Dongwookss)
 
 ### 1.2 데이터셋 구성
 - **입력 데이터**
