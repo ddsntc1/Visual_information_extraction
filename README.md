@@ -2,20 +2,24 @@
 
 ## 작성자: 강동욱
 
-[🤗 Dongwooks HF-repo](https://huggingface.co/Dongwookss)
+[🤗 Dongwooks HF-repo](https://huggingface.co/Dongwookss) 
+
+*본 테스트를 노출시키지 않기 위해 Private로 저장하였습니다. 따라서 ipynb상에 repo 저장부분이 있으나 실제 private 로 저장되었습니다*
+
+
 
 ![HuggingFace](https://img.shields.io/badge/huggingface-yellow?style=for-the-badge&logo=HuggingFace)
 ![Colab](https://img.shields.io/badge/Colab-black?style=for-the-badge&logo=GoogleColab)
 
 
 ## 목차
-1. [프로젝트 개요](#1-프로젝트-개요)
-2. [실험 결과](#2-실험-결과)
+1. [프로젝트 개요](#1-Summary)
+2. [실험 결과](#2-Experimental-results)
 3. [개발 환경](#3-개발-환경)
 4. [기술적 접근 방식](#4-기술적-접근-방식)
 5. [결론 및 향후 과제](#5-결론-및-향후-과제)
 
-## 1. 프로젝트 개요
+## 1. Summary
 
 ### 1.1 과제 목표
 
@@ -43,10 +47,10 @@
 - Sliding Window 기법 적용
 - 데이터 라벨링 품질 개선
 
-## 2. 실험 결과
+## 2. Experimental results
 
 ### 2.1 성능 평가 지표
-| 버전 | F1 점수 | 정확도(EM) | 정확도(공백 제외) | 주요 변경사항 |
+| 버전 | F1  | EM | EM_no_space | 주요 변경사항 |
 |-----|----------|------------|------------------|--------------|
 | v1 | 76.7090 | 36.1671 | 36.1671 | 기본 구현 |
 | v2 | 80.6816 | 50.0000 | 50.0000 | 데이터 처리 개선, 학습 파라미터 조정 |
@@ -66,12 +70,12 @@
    - 토큰 처리 제한 문제 해결
    - 라벨링 품질 향상
 
-## 3. 개발 환경
+## 3. Instructions
 
 ### 3.1 Hardware/Software 환경
 - **개발 플랫폼**: Google Colab
   - 데이터 전처리: CPU 환경
-  - 모델 학습/추론: GPU(L4) 환경
+  - 모델 학습/추론: GPU(L4) 환경 
 
 ### 3.2 주요 라이브러리
 ```python
