@@ -2,6 +2,10 @@
 
 ## 작성자: 강동욱
 
+![HuggingFace](https://img.shields.io/badge/huggingface-yellow?style=for-the-badge&logo=HuggingFace)
+![Colab](https://img.shields.io/badge/Colab-black?style=for-the-badge&logo=GoogleColab)
+
+
 ## 목차
 1. [프로젝트 개요](#1-프로젝트-개요)
 2. [실험 결과](#2-실험-결과)
@@ -12,19 +16,20 @@
 ## 1. 프로젝트 개요
 
 ### 1.1 과제 목표
-본 프로젝트는 SROIE 데이터셋을 활용하여 영수증 문서에서 주요 정보(company, date, address, total)를 자동으로 추출하는 시스템을 개발하는 것을 목표로 합니다. 이는 문서 처리 자동화의 핵심 과제로, 정확하고 효율적인 정보 추출이 요구됩니다.
+본 프로젝트는 SROIE 데이터셋을 활용하여 영수증 문서에서 주요 정보(company, date, address, total)를 자동으로 추출하는 모델을 개발하는 것을 목표로 합니다. 이는 문서 처리 자동화의 핵심 과제로, 정확하고 효율적인 정보 추출이 요구됩니다.
 
 ### 1.2 데이터셋 구성
 - **입력 데이터**
-  - 단어 및 bounding box 좌표 정보
-  - BIO 태깅 정보 (conll format)
-  - 정규화된 좌표 데이터
+  - 단어에 대한 정보
+  - normalised bounding box 좌표 정보
+  - 이미지 정보
 
-- **추출 대상 정보**
-  - Company (회사명)
-  - Date (날짜)
-  - Address (주소)
-  - Total (총액)
+- **추출 대상(label) 정보**
+  - Company 
+  - Date 
+  - Address 
+  - Total
+  - Others
 
 ### 1.3 접근 방법
 - [LayoutLMv3 모델](https://huggingface.co/microsoft/layoutlmv3-base) Fine-tuning
@@ -46,8 +51,8 @@
 ### 2.2 결과 분석
 1. **성능 향상 추이**
    - 데이터 처리 개선으로 초기 F1 점수 76.7에서 80.6으로 향상
-   - Sliding Window 도입으로 84.96까지 개선
-   - 데이터 품질 개선으로 최종 정확도 52.01 달성
+   - Sliding Window 도입으로 f1 score - 84.96까지 개선
+   - 데이터 품질 개선으로 em score - 52.01 달성
 
 2. **주요 개선점**
    - 데이터 전처리 최적화
@@ -70,10 +75,29 @@
 
 ### 3.3 프로젝트 구조
 ```
-project/
-├── look_data.ipynb // 데이터 상태를 확인하기 위해 해당 노트북을 생성하였습니다.
-├── making_dataset&modify_dataset.ipynb // 제공된 *.txt 파일과 img 데이터를 활용해서 Dataset을 생성하였습니다. 또한 훈련 데이터 개선을 위한 작업을 진행하였습니다.
-├── model_training_main.ipynb // 데이터 훈련 과정에 대한 코드입니다.
+Visual_information/extraction/
+├── look_data.ipynb - 데이터 상태를 확인하기 위해 해당 노트북을 생성하였습니다.
+├── making_dataset&modify_dataset.ipynb - 제공된 *.txt 파일과 img 데이터를 활용해서 Dataset을 생성하였습니다. 또한 훈련 데이터 개선을 위한 작업을 진행하였습니다.
+├── model_training_main.ipynb - 데이터 훈련 과정에 대한 코드입니다.
+└── data/
+    ├── train/
+        └── entities/
+        └── img/
+    ├── test/
+        └── entities/
+        └── img/
+
+    ├── op_test.txt
+    ├── op_test_box.txt
+    ├── op_test_image.txt
+
+    ├── train.txt
+    ├── train_box.txt
+    ├── train_image.txt
+
+    ├── test.txt
+    ├── test_box.txt
+    └── test_image.txt
 
 ```
 
@@ -81,14 +105,19 @@ project/
 
 ### 4.1 초기 분석 및 모델 선정
 1. **데이터 분석**
-   - 데이터 구조 및 품질 평가
+   - 데이터 구조 및 품질 분석 진행 - look_data.ipynb를 활용하여 직접 데이터 라벨링 확인
+       - 데이터 label의 정확도가 낮은 점을 확인
    - 라벨링 패턴 분석
 
-2. **모델 선정**
-   - LayoutLMv3 선택 이유
-     - 최신 아키텍처 적용
-     - 공간 정보 활용 가능
-     - 우수한 성능 기록
+| 특성 | LayoutLM | LayoutLMv2 | LayoutLMv3 |
+|-----|----------|------------|------------|
+| **기본 구조** | BERT 기반 + 2D 위치 임베딩 | LayoutLM + 시각적 임베딩 | Transformer 기반 통합 아키텍처 |
+| **주요 특징** | - 텍스트와 레이아웃 정보 통합<br>- 단순한 구조 | - 시각적 백본 도입<br>- 텍스트-이미지 정렬 | - 단일 다중 모달 인코더<br>- WPA(Word-Patch Alignment) |
+| **장점** | - 학습 효율성 높음<br>- 빠른 추론 속도 | - 이미지 특징 활용<br>- 향상된 성능 | - 효율적인 통합 처리<br>- 최고 수준의 성능<br>- 계산 자원 효율성 |
+| **한계점** | - 이미지 특징 미활용<br>- 제한적 모델링 | - 복잡한 구조<br>- 높은 학습 비용 | - 큰 모델 크기<br>- 높은 메모리 요구량 |
+| **성능** | Form Understanding<br>FUNSD: 79.3% | Form Understanding <br> FUNSD: 82.8% | Form Understanding <br> FUNSD: 85.4% |
+| **선정 여부** | ❌ | ❌ | ✅ |
+| **선정 이유** | - | - | - 단일 인코더 효율성<br>- 향상된 정보 통합<br>- 최신 사전학습 기법<br>- SOTA 성능 |
 
 ### 4.2 개발 과정
 
@@ -113,6 +142,18 @@ training_args = TrainingArguments(
   - Position Embedding 제한 (514 토큰)
 
 - **Sliding Window 구현**
+
+| 구분 | 적용 전 | 적용 후 |
+|-----|---------|---------|
+| **처리 방식** | 단일 패스로 전체 문서 처리 | 중첩 윈도우로 분할 처리<br>`window_size=384, stride=192` |
+| **장점** | - 구현 단순<br>- 문맥 유지 용이<br>- 메모리 효율적 | - 긴 문서 처리 가능<br>- 토큰 손실 방지<br>- Position Embedding 제한 극복 |
+| **단점** | - 긴 문서 절단<br>- Position Embedding 제한<br>- 토큰 손실 발생 | - 구현 복잡도 증가<br>- 중복 처리 필요<br>- 경계 부분 문맥 유실 가능성 |
+| **성능** | F1: 80.4974<br>EM: 49.7839 | F1: 84.9650<br>EM: 50.4323 |
+| **메모리 사용** | 낮음 | 중복 처리로 인한 증가 |
+| **처리 속도** | 빠름 | 중복 영역 처리로 인한 지연 |
+| **활용 사례** | - 짧은 문서<br>- 단순한 레이아웃 | - 긴 문서<br>- 복잡한 레이아웃<br>- 정밀한 정보 추출 필요 시 |
+
+
   ```
   Window Size: 384 tokens
   Stride: 192 tokens
