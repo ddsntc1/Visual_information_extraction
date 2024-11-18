@@ -71,15 +71,10 @@
 ### 3.3 프로젝트 구조
 ```
 project/
-├── preprocessing/
-│   ├── data_loader.py
-│   ├── text_processor.py
-│   └── label_modifier.py
-├── model/
-│   ├── train.py
-│   └── inference.py
-└── utils/
-    └── evaluation.py
+├── look_data.ipynb // 데이터 상태를 확인하기 위해 해당 노트북을 생성하였습니다.
+├── making_dataset&modify_dataset.ipynb // 제공된 *.txt 파일과 img 데이터를 활용해서 Dataset을 생성하였습니다. 또한 훈련 데이터 개선을 위한 작업을 진행하였습니다.
+├── model_training_main.ipynb // 데이터 훈련 과정에 대한 코드입니다.
+
 ```
 
 ## 4. 기술적 접근 방식
