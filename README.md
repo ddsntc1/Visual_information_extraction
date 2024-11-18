@@ -13,10 +13,10 @@
 
 
 ## 목차
-1. [프로젝트 개요](#1-Summary)
-2. [실험 결과](#2-Experimental-results)
-3. [개발 환경](#3-개발-환경)
-4. [기술적 접근 방식](#4-기술적-접근-방식)
+1. [Summary](#1-summary)
+2. [Experimental Results](#2-experimental-results)
+3. [Instructions](#3-instructions)
+4. [Approach](#4-approach)
 5. [결론 및 향후 과제](#5-결론-및-향후-과제)
 
 ## 1. Summary
@@ -25,7 +25,7 @@
 
 본 프로젝트는 문서 이해 분야의 핵심 과제인 정보 추출(Information Extraction) 태스크를 다룹니다. 구체적으로는 영수증 문서에서 회사명, 날짜, 주소, 총액과 같은 핵심 정보를 자동으로 추출하는 딥러닝 모델을 개발하여, 문서 처리 자동화의 정확성과 효율성을 갖춘 모델을 목표로 합니다.
 
-이를 위해 최신 문서 이해 모델인 LayoutLMv3를 기반으로 하여, 텍스트 정보와 공간 정보를 효과적으로 활용하는 방법을 연구했습니다. 특히 긴 문서 처리를 위한 Sliding Window 기법의 도입과 데이터 품질 개선을 통해, 실제 업무 환경에서 활용 가능한 수준의 성능을 달성하는 것을 목표로 진행하였습니다.
+이를 위해 최신 문서 이해 모델인 LayoutLMv3를 기반으로 하여, 텍스트 정보와 공간 정보를 효과적으로 활용하는 방법을 연구했습니다. 특히 긴 문서 처리를 위한 Sliding Window 기법의 도입과 데이터 품질 개선을 통해, 실제 업무 환경에서 활용 가능한 수준의 성능을 달성하는 것을 목표로 진행하였습니다. 문서 처리를 위한 Sliding Window 기법의 도입과 데이터셋 품질 개선을 통해 최종적으로 **F1 점수 84.96**, **정확도(EM) 50.43**을 달성하였습니다.
 
 [Dongwooks HF-repo](https://huggingface.co/Dongwookss)
 
@@ -112,7 +112,7 @@ Visual_information/extraction/
 
 ```
 
-## 4. 기술적 접근 방식
+## 4. Approach
 
 ### 4.1 초기 분석 및 모델 선정
 1. **데이터 분석**
@@ -129,6 +129,16 @@ Visual_information/extraction/
 | **성능** | Form Understanding<br>FUNSD: 79.3% | Form Understanding <br> FUNSD: 82.8% | Form Understanding <br> FUNSD: 85.4% |
 | **선정 여부** | ❌ | ❌ | ✅ |
 | **선정 이유** | - | - | - 단일 인코더 효율성<br>- 향상된 정보 통합<br>- 최신 사전학습 기법<br>- SOTA 성능 |
+
+
+2. **Fine-tuning의 필요성**
+
+| 특성 | LayoutLMv3 (base) | LayoutLMv3 (fine-tuned) |
+|-----|----------|------------|
+| **성능** | F1: 9.64<br>EM: 0.00<br>EM_no_space: 0.00 | F1: 84.96<br>EM: 50.43<br>EM_no_space: 50.43 |
+| **분석** | - 사전학습만 된 상태<br>- SROIE 태스크에 대한 훈련 없음<br>- Zero-shot 성능 낮음 | - SROIE 데이터로 Fine-tuning<br>- 태스크에 특화된 학습 완료<br>- 높은 성능 달성 |
+
+Base 모델과 Fine-tuned 모델의 성능 차이는 문서 정보 추출 태스크에서 도메인 특화 학습의 중요성을 잘 보여줍니다. 사전학습된 LayoutLMv3 base 모델은 일반적인 문서 이해 능력을 보유하고 있으나, 특정 도메인(영수증)과 태스크(정보 추출)에 대한 fine-tuning 없이는 실용적인 성능을 달성하기 어렵다는 것을 확인할 수 있습니다.
 
 ### 4.2 개발 과정
 
@@ -147,10 +157,10 @@ training_args = TrainingArguments(
 - 데이터셋 구축 및 기본 학습
 - 파라미터 최적화 진행
 
-#### 2) 토큰 제한 문제 해결 (v3-v5)
+#### 2) Sliding Window 도입 (v3-v5)
 - **문제 발견**
-  - 긴 텍스트 처리 시 토큰 손실
-  - Position Embedding 제한 (514 토큰)
+  - 긴 텍스트 처리 시 토큰 손실 문제
+  - Position Embedding 514 토큰 제한 이슈
 
 - **Sliding Window 구현**
 
@@ -165,11 +175,22 @@ training_args = TrainingArguments(
 | **활용 사례** | - 짧은 문서<br>- 단순한 레이아웃 | - 긴 문서<br>- 복잡한 레이아웃<br>- 정밀한 정보 추출 필요 시 |
 
 
-  ```
-  Window Size: 384 tokens
-  Stride: 192 tokens
-  Overlap: 192 tokens
-  ```
+
+- **구현 세부사항**
+  ```python
+  # Sliding Window 파라미터
+  window_size = 384  # 단일 윈도우 크기
+  stride = 192      # 윈도우 이동 간격
+  overlap = 192     # 중첩 영역
+  
+  # 윈도우 처리 로직
+  def process_with_sliding_window(text):
+      windows = []
+      for i in range(0, len(text), stride):
+          window = text[i:i + window_size]
+          windows.append(window)
+      return windows 
+
 
 #### 3) 데이터 품질 개선 (v6)
 - **라벨링 개선**
