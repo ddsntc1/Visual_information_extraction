@@ -4,8 +4,10 @@
 
 [🤗 Dongwooks HF-repo](https://huggingface.co/Dongwookss) 
 
-*본 테스트를 노출시키지 않기 위해 데이터셋은 Private로 저장하였습니다. 따라서 ipynb상에 repo 저장부분이 있으나 실제 private 로 저장되었습니다*
-*결과 모델은 용량으로 인해 git upload가 불가하여 huggingface에 업로드 하였습니다*
+*본 테스트를 노출시키지 않기 위해 데이터셋은 Private로 저장하였습니다.*     
+*따라서 ipynb상에 repo 저장부분이 있으나 실제 private 로 저장되었습니다*    
+*결과 모델은 용량으로 인해 git upload가 불가하여 huggingface에 업로드 하였습니다*  
+    
 Result_Model : [VIE_TASK_v5](https://huggingface.co/Dongwookss/vie_task_v5)
 
 
@@ -24,11 +26,9 @@ Result_Model : [VIE_TASK_v5](https://huggingface.co/Dongwookss/vie_task_v5)
 
 ### 1.1 과제 목표
 
-본 프로젝트는 문서 이해 분야의 핵심 과제인 정보 추출(Information Extraction) 태스크를 다룹니다. 구체적으로는 영수증 문서에서 회사명, 날짜, 주소, 총액과 같은 핵심 정보를 자동으로 추출하는 딥러닝 모델을 개발하여, 문서 처리 자동화의 정확성과 효율성을 갖춘 모델을 목표로 합니다.
+본 프로젝트는 문서 이해 분야의 핵심 과제인 정보 추출(Information Extraction) 태스크를 다룹니다. 구체적으로는 영수증 문서에서 회사명, 날짜, 주소, 총액과 같은 핵심 정보를 자동으로 추출하는 딥러닝 모델을 개발하여, 문서 처리 자동화의 정확성과 효율성을 갖춘 모델을 목표로 하였습니다.
 
 이를 위해 최신 문서 이해 모델인 LayoutLMv3를 기반으로 하여, 텍스트 정보와 공간 정보를 효과적으로 활용하는 방법을 연구했습니다. 특히 긴 문서 처리를 위한 Sliding Window 기법의 도입과 데이터 품질 개선을 통해, 실제 업무 환경에서 활용 가능한 수준의 성능을 달성하는 것을 목표로 진행하였습니다. 문서 처리를 위한 Sliding Window 기법의 도입과 데이터셋 품질 개선을 통해 최종적으로 **F1 점수 84.96**, **정확도(EM) 50.43**을 달성하였습니다.
-
-[Dongwooks HF-repo](https://huggingface.co/Dongwookss)
 
 ### 1.2 데이터셋 구성
 - **입력 데이터**
@@ -321,9 +321,14 @@ def save_and_upload():
 
 ### 4.1 초기 분석 및 모델 선정
 1. **데이터 분석**
+   - 좋은 모델을 위해서는 좋은 데이터셋이 필요하다고 생각하였습니다.
+   - txt 파일 기반으로 데이터셋을 생성하고 직접 보며 label이 잘 되어있는지 확인하였으나<br>초기에 발견보다 나중에 데이터셋의 문제점을 발견하게 되었습니다.
    - 데이터 구조 및 품질 분석 진행 - look_data.ipynb를 활용하여 직접 데이터 라벨링 확인
        - 데이터 label의 정확도가 낮은 점을 확인
    - 라벨링 패턴 분석
+
+    
+2. **모델 선정**  
 
 | 특성 | LayoutLM | LayoutLMv2 | LayoutLMv3 |
 |-----|----------|------------|------------|
@@ -336,14 +341,17 @@ def save_and_upload():
 | **선정 이유** | - | - | - 단일 인코더 효율성<br>- 향상된 정보 통합<br>- 최신 사전학습 기법<br>- SOTA 성능 |
 
 
-2. **Fine-tuning의 필요성**
+    
+
+3. **Fine-tuning의 필요성**
 
 | 특성 | LayoutLMv3 (base) | LayoutLMv3 (fine-tuned) |
 |-----|----------|------------|
 | **성능** | F1: 9.64<br>EM: 0.00<br>EM_no_space: 0.00 | F1: 84.96<br>EM: 50.43<br>EM_no_space: 50.43 |
 | **분석** | - 사전학습만 된 상태<br>- SROIE 태스크에 대한 훈련 없음<br>- Zero-shot 성능 낮음 | - SROIE 데이터로 Fine-tuning<br>- 태스크에 특화된 학습 완료<br>- 높은 성능 달성 |
 
-Base 모델과 Fine-tuned 모델의 성능 차이는 문서 정보 추출 태스크에서 도메인 특화 학습의 중요성을 잘 보여줍니다. 사전학습된 LayoutLMv3 base 모델은 일반적인 문서 이해 능력을 보유하고 있으나, 특정 도메인(영수증)과 태스크(정보 추출)에 대한 fine-tuning 없이는 실용적인 성능을 달성하기 어렵다는 것을 확인할 수 있습니다.
+Base 모델과 Fine-tuned 모델의 성능 차이로 도메인 특화 학습의 중요성을 볼 수 있었습니다.     
+사전학습된 LayoutLMv3 base 모델은 일반적인 문서 이해 능력을 보유하고 있으나, 특정 도메인(영수증)과 태스크(정보 추출)에 대한 fine-tuning 없이는 실용적인 성능을 달성하기 어렵다는 것을 확인할 수 있었습니다.
 
 ### 4.2 개발 과정
 
@@ -364,8 +372,20 @@ training_args = TrainingArguments(
 
 #### 2) Sliding Window 도입 (v3-v5)
 - **문제 발견**
-  - 긴 텍스트 처리 시 토큰 손실 문제
-  - Position Embedding 514 토큰 제한 이슈
+  - v3 
+    - output.csv 와 input 데이터를 비교하였을때 갯수가 맞지 않는것을 발견하였습니다. 
+    - 원인을 분석하던 중 파일별 단어 처리갯수를 print문을 통해 비교하였습니다.
+    - 이 결과, X51007846283 이미지 및 단어정보에 대한 토큰값이 512를 넘어서게 되어 output으로 나오지 않는 것을 발견하였습니다.
+    - Position Embedding 514 토큰 제한 이슈
+    - processor의 max_length = 2024로 수정하여 모델 훈련 진행하였습니다.
+  - v4 
+    - max_lenght를 높여도 단어의 토큰수가 일정 이상 올라가면 인식이 안되는 것을 발견하였습니다.
+    - position embedding에 있어서도 토큰수가 제한되어 있을 수 있다는 것을 발견하고 새로운 기법을 적용시켰습니다.
+    - v3 결과 모델에 inference 를 진행하며 sliding_window기법을 적용시킨 결과 결과물 평가지표가 향상됨을 발견하였습니다.
+    - v3 f1 : 80.4974 -> v4+sliding_window f1 : 84.9540
+    - Sliding window 기법 적용을 위해 훈련 단계에서부터 적용을 목표로 v5를 진행하였습니다.
+  - v5
+    - Dataset의 train과 test set에 대해서도 sliding_window를 적용시켜 훈련을 진행하였습니다.   
 
 - **Sliding Window 구현**
 
@@ -388,7 +408,7 @@ training_args = TrainingArguments(
   stride = 192      # 윈도우 이동 간격
   overlap = 192     # 중첩 영역
   
-  # 윈도우 처리 로직
+  # window 처리 로직
   def process_with_sliding_window(text):
       windows = []
       for i in range(0, len(text), stride):
@@ -399,9 +419,8 @@ training_args = TrainingArguments(
 
 #### 3) 데이터 품질 개선 (v6)
 - **라벨링 개선**
-  - entities 정보 활용
-  - 정확한 매칭 규칙 적용
-  - 일관성 검증
+  - entities 정보 활용하여 label 수정
+  - label 매칭 규칙 적용하여 기존 txt 기반 데이터셋 수정
 
 ### 4.3 성능 최적화
 ```python
@@ -418,29 +437,27 @@ training_args = TrainingArguments(
 ## 5. 결론 및 향후 과제
 
 ### 5.1 주요 성과
-1. **모델 성능**
+1. **모델 결과 및 성능**
+   - 제출모델 : [v5](https://huggingface.co/Dongwookss/vie_task_v5)
    - F1 점수: 84.9650
    - 정확도(EM): 50.4323
 
-2. **기술적 성과**
+3. **기술적 성과**
    - Sliding Window 기법 성공적 구현
    - 데이터 품질 개선 방법론 확립
 
 ### 5.2 한계점
 1. 긴 텍스트 처리의 제약
-2. 필드별 성능 편차
+2. 필드별 성능 편차로 인한 새로운 데이터 처리과정 필요
 
 ### 5.3 향후 개선 방향
 1. **데이터 처리 고도화**
-   - 필드별 패턴 인식 규칙 확장
-   - 예외 케이스 처리 강화
+   - 예외처리 혹 규칙기반 외 다른 방법론 적용이 필요함.
 
 2. **모델 최적화**
-   - Sliding Window 파라미터 튜닝
-   - 필드별 특화 모델 검토
+   - Sliding Window 파라미터 튜닝을 통한 일부 성능개선
+   - 필드별 특화 모델을 통한 원하는 label에 대한 quality가 보장되는 훈련데이터 구축
 
 3. **시스템 안정성**
-   - 자동화된 품질 검증 시스템
    - 필드별 검증 규칙 체계화
-
 ---
