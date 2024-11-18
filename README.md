@@ -112,6 +112,210 @@ Visual_information/extraction/
 
 ```
 
+### 3.4 making_dataset&modify_dataset.ipynb
+making_dataset.ipynb
+<details> 
+<summary>데이터셋 생성 및 전처리 과정</summary>
+
+#### 1. 환경 설정 및 데이터 검증
+```python
+# 필요 라이브러리 설치
+!pip install transformers datasets seqeval
+!git lfs install
+
+# 데이터 무결성 검사
+def validate_data():
+    for target in ['train', 'test', 'op_test']:
+        # 각 데이터 파일 비교 검증
+        # - image_path: 바운딩 박스 좌표
+        # - text_path: 텍스트 및 라벨
+        # - box_path: 정규화된 좌표
+```
+
+#### 2. 데이터셋 생성
+```python
+def create_dataset(target_type):
+    """학습/테스트 데이터셋 생성"""
+    dataset = []
+    
+    # 파일 경로 설정
+    txt_path = f"data/{target_type}.txt"
+    box_path = f"data/{target_type}_box.txt"
+    image_path = f"data/{target_type}_image.txt"
+    
+    # 데이터 로드 및 처리
+    - words: 텍스트 정보
+    - bboxes: 바운딩 박스 좌표
+    - norm_bboxes: 정규화된 좌표
+    - labels: BIO 태깅 정보
+    
+    # JSON 형식으로 저장
+    save_to_json(f"{target_type}_dataset.json")
+```
+
+#### 3. 데이터셋 품질 개선
+```python
+def enhance_dataset():
+    # 1. 공간 정보 활용
+    def group_by_lines(words, bboxes, y_threshold=5):
+        """세로 위치 기반 라인 그룹화"""
+        # y좌표 기반 텍스트 라인 식별
+        # 동일 라인 내 단어 정렬
+    
+    # 2. 엔티티별 매칭 규칙
+    def find_company_line(lines, company):
+        """회사명 식별 규칙"""
+        # 문서 상단 위치
+        # 특정 키워드 활용
+    
+    def find_address_line(lines, address):
+        """주소 식별 규칙"""
+        # 시작점: NO., LOT, JALAN 등
+        # 종료점: MALAYSIA, DARUL EHSAN
+        # 중단점: TEL, FAX, EMAIL
+    
+    def find_date_line(lines, target_date):
+        """날짜 식별 규칙"""
+        # 날짜 포맷 패턴 매칭
+        
+    def find_total_line(lines, total):
+        """총액 식별 규칙"""
+        # TOTAL, AMOUNT 키워드
+        # 숫자 포맷 검증
+```
+
+#### 4. Hugging Face 데이터셋 변환
+```python
+def convert_to_hf_dataset():
+    # 데이터셋 특성 정의
+    features = Features({
+        'image': Image(),
+        'label': Sequence(...),
+        'words': Sequence(...),
+        'bbox': Array2D(...),
+    })
+    
+    # Dataset 객체 생성
+    train_dataset = Dataset.from_dict(...)
+    eval_dataset = Dataset.from_dict(...)
+    
+    # Hugging Face Hub 업로드
+    dataset.push_to_hub("Dongwookss/SROIE")
+```
+</details>
+
+model_training_main.ipynb
+<details>
+<summary>모델 학습 및 추론 과정</summary>
+
+#### 1. 데이터 및 모델 준비
+```python
+# 데이터셋 로드
+dataset = load_dataset("Dongwookss/SROIE_lb1")
+processor = AutoProcessor.from_pretrained("microsoft/layoutlmv3-base")
+
+# 라벨 정의
+label_list = ["S-COMPANY", "S-DATE", "S-ADDRESS", "S-TOTAL", "O"]
+id2label = {k: v for k,v in enumerate(label_list)}
+```
+
+#### 2. 데이터 전처리
+```python
+def prepare_examples(examples, window_size=384, stride=192):
+    """Sliding Window 적용 데이터 처리"""
+    
+    # 입력 처리
+    - 이미지 포맷 변환 (RGB)
+    - 텍스트 토큰화
+    - 바운딩 박스 정규화
+    
+    # Sliding Window 적용
+    - window_size=384로 문서 분할
+    - stride=192로 중첩 영역 설정
+    - 토큰화 및 패딩 처리
+    
+    # 결과 포맷
+    - pixel_values
+    - input_ids
+    - attention_mask
+    - bbox
+    - labels
+```
+
+#### 3. 모델 학습
+```python
+# 학습 설정
+training_args = TrainingArguments(
+    output_dir="test",
+    max_steps=1500,
+    per_device_train_batch_size=2,
+    learning_rate=2e-5,
+    evaluation_strategy="steps",
+    eval_steps=100,
+    metric_for_best_model="f1"
+)
+
+# 평가 메트릭
+def compute_metrics(p):
+    """seqeval 기반 성능 평가"""
+    - precision
+    - recall
+    - f1
+    - accuracy
+
+# 모델 학습
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset,
+    compute_metrics=compute_metrics
+)
+
+trainer.train()
+```
+
+#### 4. 추론 및 결과 처리
+```python
+def process_with_sliding_window(example, model, processor):
+    """Sliding Window 기반 추론"""
+    
+    # 윈도우 처리
+    def safe_process_window():
+        # 단일 윈도우 처리
+        # word_ids 추적
+        # 예측 결과 저장
+    
+    # 전체 문서 처리
+    - 첫 번째 윈도우 처리
+    - 미처리 단어 확인
+    - 두 번째 윈도우 처리
+    - 결과 병합
+    
+    # 후처리
+    - 예측 라벨 정리
+    - 결과 포맷팅
+    - CSV 파일 저장
+```
+
+#### 5. 모델 저장 및 배포
+```python
+def save_and_upload():
+    """모델 저장 및 Hugging Face Hub 업로드"""
+    
+    # 모델 저장
+    trainer.save_model()
+    
+    # Hugging Face Hub 업로드
+    upload_folder_to_huggingface(
+        folder_path="test/checkpoint-1500",
+        repo_id="Dongwookss/vie_task",
+        token=HF_TOKEN
+    )
+```
+</details>
+
+
 ## 4. Approach
 
 ### 4.1 초기 분석 및 모델 선정
