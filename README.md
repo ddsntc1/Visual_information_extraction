@@ -81,9 +81,12 @@ Result_Model : [VIE_TASK_v5](https://huggingface.co/Dongwookss/vie_task_v5)
 
 ### 3.2 주요 라이브러리
 ```python
-- transformers
-- datasets
-- torch
+- transformers==4.46.2
+- torch==2.5.1+cu121
+- datasets==3.1.0  
+- huggingface-hub==0.26.2
+- seqeval==1.2.2
+- sentence-transformers==3.2.1
 ```
 
 ### 3.3 프로젝트 구조
