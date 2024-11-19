@@ -424,8 +424,8 @@ training_args = TrainingArguments(
 #### 3) 데이터 품질 개선 (v6)
 - **라벨링 개선**
   - entities 정보 활용하여 label 수정
-  - label 매칭 규칙 적용하여 기존 txt 기반 데이터셋 수정
-
+  - OCR 글자인식을 수행하며 label이 속한 bbox를 추출하고 해당 문장 혹은 단어가 속한 바운딩박스 내 단어에 대해서 라벨 재부여
+  
 ### 4.3 성능 최적화
 ```python
 training_args = TrainingArguments(
