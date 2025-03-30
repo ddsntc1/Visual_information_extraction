@@ -3,12 +3,9 @@
 ## 작성자: 강동욱
 
 [🤗 Dongwooks HF-repo](https://huggingface.co/Dongwookss) 
-
-*본 테스트를 노출시키지 않기 위해 데이터셋은 Private로 저장하였습니다.*     
-*따라서 ipynb상에 repo 저장부분이 있으나 실제 private 로 저장되었습니다*    
+ 
 *결과 모델은 용량으로 인해 git upload가 불가하여 huggingface에 업로드 하였습니다*  
 
-*진행 과정에서 쉬운 모델 저장을 위해 Huggingface에 private상태로 업로드 되어있으며 평가를 위해 필요할 경우 public으로 하겠습니다!*    
 Result_Model : [VIE_TASK_v5](https://huggingface.co/Dongwookss/vie_task_v5)
 
 
